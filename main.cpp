@@ -8,34 +8,38 @@ using namespace std;
 
 int main()
 {
-    Pool<int> pool;
+    Pool<int, 10> pool;
+    cout << "Entering bloc1" << endl;
     {
         cout << "Getting our first object" << endl;
-        auto i1 = pool.get_object();
+        auto& i1 = pool.get_object();
+        cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << endl;
         *i1 = 2;
-        cout << "what is in i1 : " << *i1 << endl;
-        cout << "hash i1 is " << Pool<int>::hash(i1) << endl;
-        cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << " allocated : " << pool.allocated() << " inuse : " << pool.inuse() << endl;
+        pool.obj_info(i1);
+        pool.display_free();
+        cout << "Getting our second object" << endl;
+        auto& i2 = pool.get_object();
+        pool.display_free();
+        cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << endl;
+        *i2 = 3;
+        pool.obj_info(i2);
         cout << "Exiting from bloc1" << endl;
+        pool.allocated_objects.clear();
     }
-    cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << " allocated : " << pool.allocated() << " inuse : " << pool.inuse() << endl;
-    cout << "Getting another object" << endl;
-    auto i1 = pool.get_object();
-    *i1 = 4;
-    cout << "what is in i1 : " << *i1 << endl;
-    cout << "hash i1 is " << Pool<int>::hash(i1) << endl;
-    cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << " allocated : " << pool.allocated() << " inuse : " << pool.inuse() << endl;
-    cout << "deleting i1" << endl;
-    // i1.reset(nullptr);
-    Pool<int>::release(i1);
-    cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << " allocated : " << pool.allocated() << " inuse : " << pool.inuse() << endl;
-    auto i2 = pool.get_object();
-    cout << "Getting another object" << endl;
-    cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << " allocated : " << pool.allocated() << " inuse : " << pool.inuse() << endl;
-    cout << "hash i2 is " << Pool<int>::hash(i2) << endl;
-    cout << "index of i2 : " << pool.get_i(i2) << endl;
-    cout << "Getting another object" << endl;
-    auto i3 = pool.get_object();
-    cout << "hash i3 is " << Pool<int>::hash(i3) << endl;
-    cout << "index of i3 : " << pool.get_i(i3) << endl;
+    cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << endl;
+        cout << "Getting our first object" << endl;
+        auto& i1 = pool.get_object();
+        cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << endl;
+        *i1 = 2;
+        pool.obj_info(i1);
+        pool.display_free();
+        cout << "Getting our second object" << endl;
+        auto& i2 = pool.get_object();
+        pool.display_free();
+        cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << endl;
+        *i2 = 3;
+        pool.obj_info(i2);
+        cout << "Getting second object by index " << endl;
+        cout << "Exiting..." << endl;
+        cout.flush();
 }
