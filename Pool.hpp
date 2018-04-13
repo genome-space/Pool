@@ -1,3 +1,5 @@
+#pragma once
+
 #include <memory>
 #include <vector>
 #include <functional>
@@ -27,10 +29,11 @@ struct Pool
     del_type del_fun = std::bind(&Pool::del_object,this,std::placeholders::_1);;
     using del_ptr = std::unique_ptr<T, del_type>;
 
-  public:
     using hash_t = std::hash<typename Pool<T, ChunkSize>::del_ptr>;
     static std::size_t hash(del_ptr& t) { return hash_t()(t); }
     std::map<std::size_t,del_ptr> allocated_objects;
+
+  public:
 
     auto& get_object()
     {
@@ -72,8 +75,8 @@ struct Pool
     }
 
     std::size_t get_i(del_ptr& t) { return h2i[hash(t)]; }
-
-    static void release(del_ptr& t) { t.reset(nullptr); }
+    
+    void erase(del_ptr& t) { allocated_objects.erase(get_i(t)); t.reset(nullptr); }
 
     void obj_info(del_ptr& t) {
         std::cout << "value : " << *t << ", i : " << get_i(t) <<  ", ii : " << ", hash : " << hash(t) << std::endl;

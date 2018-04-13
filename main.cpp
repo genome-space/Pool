@@ -24,7 +24,8 @@ int main()
         *i2 = 3;
         pool.obj_info(i2);
         cout << "Exiting from bloc1" << endl;
-        pool.allocated_objects.clear();
+        pool.erase(i1);
+        pool.erase(i2);
     }
     cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << endl;
         cout << "Getting our first object" << endl;
