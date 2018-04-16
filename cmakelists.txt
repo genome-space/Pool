@@ -4,7 +4,7 @@ project(pool VERSION 0.0.0)
 include(CTest)
 enable_testing()
 
-add_executable(pool main.cpp)
+add_executable(pool main.cpp Pool.hpp UniqueProxy.hpp)
 
 target_compile_features(pool PUBLIC cxx_std_17)
 
