@@ -8,12 +8,13 @@ using namespace std;
 
 int main()
 {
-    Pool<int> pool(12);
-    // cout << "Entering bloc1" << endl;
-    // {
-    //     cout << "Getting our first object" << endl;
-    //     auto& i1 = pool.allocate();
-    //     cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << endl;
+    Pool<int, 10> pool;
+    cout << "Entering bloc1" << endl;
+    {
+        cout << "Getting our first object" << endl;
+        auto&& i1 = pool.allocate();
+        cout << "Pool size : " << pool.size() << " capacity : " << pool.capacity() << endl;
+    }
     //     *i1 = 2;
     //     pool.obj_info(i1);
     //     pool.display_free();

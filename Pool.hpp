@@ -2,32 +2,27 @@
 
 #include <vector>
 #include <map>
+#include <iostream>
+#include "UniqueProxy.hpp"
 
-template <class T, std::size_t ChunkSize>
-class Pool
+template <class T, std::size_t ChunkSize> 
+struct Pool : public UniqueProxy<T, Pool<T,ChunkSize>>
 {
-
-  private:
     std::vector<std::size_t> free_objects;
     std::map<std::size_t, std::size_t> h2i;
-    using del_ptr = typename UniqueProxy<T>::del_ptr;
-    std::vector<del_ptr> indexed_objects;
+    using super = UniqueProxy<T, Pool<T,ChunkSize>>;
+    using del_ptr = typename super::del_ptr;
+    std::vector<std::unique_ptr<T>> indexed_objects;
 
-    auto &get_object()
-    {
-        auto new_obj = T();
-        auto &unique_obj = del_ptr{&new_obj, _del_fun};
-        return std::move(unique_obj);
-    }
 
     void del_object(std::size_t h, T *ptr_obj)
     {
         auto i = h2i[h];
         free_objects.push_back(i);
-        indexed_objects[i] = del_ptr{ptr_obj};
+        indexed_objects[i] = std::unique_ptr<T>{ptr_obj};
     }
 
-    del_ptr &pool_allocate()
+    auto&& allocate()
     {
         if (free_objects.empty())
         {
@@ -38,16 +33,16 @@ class Pool
             for (auto i = 0; i < ChunkSize; i++)
             {
                 free_objects[oldsize + i] = oldsize + ChunkSize - i - 1;
-                auto &new_obj = _unique_proxy.get_object();
-                h2i[UniqueProxy<T>::hash(new_obj)] = oldsize + i;
+                auto new_obj = std::unique_ptr<T>{this->get_object().release()};
+                h2i[std::hash<std::unique_ptr<T>>()(new_obj)] = oldsize + i;
+                indexed_objects[oldsize + i] = std::move(new_obj);
             }
         }
         auto i = free_objects.back();
         free_objects.pop_back();
-        return std::move(indexed_objects[i]);
+        std::unique_ptr<T> available_object = std::move(indexed_objects[i]);
+        return del_ptr{available_object.release(),_del_fun};
     }
-
-  public:
 
     void display_free()
     {
@@ -71,7 +66,7 @@ class Pool
         return indexed_objects.size();
     }
 
-    std::size_t get_i(del_ptr &t) { return h2i[UniqueProxy<T>::hash(t)]; }
+    std::size_t get_i(del_ptr &t) { return h2i[hash(t)]; }
 
     void obj_info(del_ptr &t)
     {
